@@ -1,1 +1,213 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+app-root {
+    min-height: 75vh;
+    flex-grow: 1;
+    padding: 5rem;
+
+}
+
+h1 {
+	font-size: 6rem;
+	font-weight: 300;
+}
+h2 {
+	font-size: 5rem;
+	font-weight: 300;
+}
+h3 {
+	font-size: 4rem;
+	font-weight: 400;
+}
+h4 {
+	font-size: 36px;
+	font-weight: 400;
+}
+h5 {
+	font-size: 1.5rem;
+	font-weight: 400;
+	margin: 0px;
+}
+h6 {
+	font-size: 1.25rem;
+	font-weight: 500;
+}
+
+.task {
+    width: 80%;
+    border: 1px solid #e4e4e4;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+	background: #F7F7F7;
+}
+
+.task--details {
+    width: 100;
+    height: auto;
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+    padding: 0rem 1.5rem;
+
+	.task-details--title {
+		font-size: 36px;
+		font-weight: 300;
+	}
+}
+
+hr {
+	border: 0;
+	clear:both;
+	display:block;
+	width: 96%;               
+	background-color:#2EBC99;
+	height: 1px;
+}
+
+.task-details--toolbar {
+    display: flex;
+    width: 100%;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    justify-content: space-between;
+
+	.details--item {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		justify-content: flex-start;
+
+		a,
+		span {
+			display: inline;
+		}
+		.material-icons {
+			vertical-align: top;
+			margin-right: 5px !important;
+		}
+	}
+}
+
+.task--instructions {
+	padding: 0rem 1rem;
+
+	.inline {
+		display: inline !important;
+	}
+
+	ul {
+		list-style-type: none;
+	}
+}
+
+.task--comments {
+	padding: 0rem 1rem;
+}
+
+.task--form-container{
+	font: 95% Arial, Helvetica, sans-serif;
+	position: relative;
+	padding: 16px;
+    width: 50%;
+	background: #F7F7F7;
+    margin: 0 auto;
+	h1 {
+		background: #43D1AF;
+		padding: 20px 0;
+		font-size: 140%;
+		font-weight: 300;
+		text-align: center;
+		color: #fff;
+		margin: -16px -16px 16px -16px;
+	}
+
+	input[type="text"],
+	textarea {
+		outline: none;
+		box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		width: 100%;
+		background: #fff;
+		margin-bottom: 4%;
+		border: 1px solid #ccc;
+		padding: 3%;
+		color: #555;
+		font: 95% Arial, Helvetica, sans-serif;
+		resize: none;
+		width: 100%;
+		max-width: 100%;
+		min-width: 100%;
+		height: 100px;
+	}
+
+	input[type="text"]:focus,
+	textarea:focus {
+		box-shadow: 0 0 5px #43D1AF;
+		padding: 3%;
+		border: 1px solid #43D1AF;
+	}
+
+	input[type="submit"],
+	input[type="button"] {
+		box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		width: 100%;
+		padding: 3%;
+		background: #43D1AF;
+		border-bottom: 2px solid #30C29E;
+		border-top-style: none;
+		border-right-style: none;
+		border-left-style: none;	
+		color: #fff;
+	}
+
+	input[type="submit"]:hover,
+	input[type="button"]:hover{
+		background: #2EBC99;
+	}
+}
+
+.user-dropdown {
+	display: none;
+	position: absolute;
+	width: 20vw;
+	max-height: 15vh;
+	overflow-y: scroll;
+	padding: 0px;
+	top: -10vh;
+	left: 2rem;
+	border: 1px solid #e4e4e4;
+	background-color: #F7F7F7;
+	box-shadow: 0 0 3px #e4e4e4;
+
+	.user-dropdown--list {
+		position: relative;
+		width: 100%;
+		padding: 0;
+		margin: 0;
+		list-style: none;
+		.user-list--item {
+			color: #555;
+			padding: 0.25rem 1rem;
+			&:hover {
+				background-color: #e4e4e4;
+				color: #30C29E;
+				cursor: pointer;
+			}
+		}
+	}
+}
+
+.user-dropdown.visible {
+	display: inline-block;
+}
