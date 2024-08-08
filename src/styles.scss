@@ -178,7 +178,7 @@ hr {
 }
 
 .user-dropdown {
-	display: none;
+	display: inline-block;
 	position: absolute;
 	width: 20vw;
 	max-height: 15vh;
@@ -208,6 +208,6 @@ hr {
 	}
 }
 
-.user-dropdown.visible {
-	display: inline-block;
+.user-dropdown {
+	display: inline-block !important
 }

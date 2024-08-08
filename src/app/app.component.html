@@ -72,7 +72,7 @@
   <div class="task--comments" *ngIf="comments.length > 0">
     <h5>Comments:</h5>
     <ul class="comments-list">
-      <li *ngFor="let comment of comments" class="comments">
+      <li *ngFor="let comment of comments" class="comment-list--item">
         <p class="comment--text">
           {{ comment.content }}
           <small>
@@ -86,15 +86,20 @@
 
   <!-- TODO: Reduce to Partial/Component -->
   <div class="task--form-container">
-    <form class="message-form" [formGroup]="commentForm" (ngSubmit)="onSubmit()">
-      <textarea id="message" name="message" placeholder="Your message" formControlName="message"></textarea>
+    <form class="comment-form" [formGroup]="commentForm" (ngSubmit)="onSubmit()">
+      <textarea
+        id="comment"
+        name="comment"
+        placeholder="Your message"
+        formControlName="comment"
+      ></textarea>
       <input type="submit" value="Submit Comment">
     </form>
     <!-- POTENTIAL TODO: Reduce to Partial/Component -->
-    <div class="user-dropdown" [ngClass]="{ 'visible': showUserDropdown }">
+    <div class="user-dropdown" *ngIf="showUserDropdown">
       <ul *ngIf="showUserDropdown" class="user-dropdown--list">
         <li
-          *ngFor="let user of users"
+          *ngFor="let user of filteredUsers"
           (click)="injectUserTag(user)"
           class="user-list--item"
         >

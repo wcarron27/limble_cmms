@@ -2,6 +2,18 @@ import { Component, HostListener, Inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { FormsModule, NgForm, ReactiveFormsModule, FormGroup, FormBuilder } from '@angular/forms';
+import { AlertService } from './alert.service';
+
+interface User {
+  userID: number,
+  name: string
+}
+
+interface Comment {
+  created_at: number, // Using Date.now instead of new Date
+  content: string
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -9,47 +21,55 @@ import { FormsModule, NgForm, ReactiveFormsModule, FormGroup, FormBuilder } from
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
+
 export class AppComponent {
-  constructor(@Inject(DOCUMENT) private document: HTMLDocument, private formBuilder: FormBuilder) {
+  constructor(@Inject(DOCUMENT) private document: typeof DOCUMENT, private formBuilder: FormBuilder, private alertService: AlertService) {
     this.createContactForm();
   }
 
-  // Component Listeners
-  @HostListener('document:keydown', ['$event'])
+  /* Component Listener
+  This HostListener provides a lot of the key functionality.
+  It uses keyup events to determine the state of the User dropdown
+  and determine when to filter the list of users
+  */
+  @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-    if (event.key == "@" && !this.showUserDropdown) {
-      this.toggleUserDropdown()
+    if (this.showUserDropdown == true && event.key == "Escape") {
+      this.showUserDropdown = false
+      return
     }
 
-    if (this.showUserDropdown == true) {
-      // only toggle on 'Escape' if dropdown is already open
-      event.key == "Escape"
-        ? this.toggleUserDropdown()
-        : null // filter results by slice of comment eventually
+    let comment = this.commentForm.value.comment
+    let len = comment.length
+    let lastChar = comment[len - 1]
+
+    if (lastChar == '@') {
+      this.showUserDropdown = true
+      this.filterUserList()
+    } else if (/\s$/.test(comment)) { // exit if the name is typed out (requires different alert system)
+      this.showUserDropdown = false
+    }  else {
+      this.filterUserList()
     }
-    console.log('Key pressed:', event.key);
   }
 
   // Component Data
-  title = 'limble_cmms';
+  title = 'Limble CMMS Project';
   showUserDropdown = false;
-  // @ts-ignore
-  comments: any[] = [];
+  comments: Comment[] = [];
   users = [
     {'userID' : 1, 'name' : 'Kevin'},
     {'userID' : 2, 'name' : 'Jeff'},
     {'userID' : 3, 'name' : 'Bryan'},
     {'userID' : 4, 'name' : 'Gabbey'},
   ];
-  filteredUsers: any = [];
+  filteredUsers: User[] = [];
   commentForm!: FormGroup;
-  targetCommentUsers: any[] = []; // This is not ideal, but it was a way to send the alert
-  // without duplicating code that parses the comment
 
   // Call in constructor to initialize the form
   createContactForm() {
     this.commentForm = this.formBuilder.group({
-      message: ['']
+      comment: ['']
     });
   };
 
@@ -64,40 +84,53 @@ export class AppComponent {
 
   // Small abstraction for visual clarity and naming
   clearForm() {
-    this.commentForm.controls['message'].setValue('');
+    this.commentForm.controls['comment'].setValue('');
   };
 
   onSubmit() {
-    this.saveComment(this.commentForm.value.message);
+    this.saveComment(this.commentForm.value.comment);
     this.sendAlerts();
     this.clearForm();
   };
 
-  toggleUserDropdown() {
-    this.showUserDropdown = !this.showUserDropdown;
-  };
-
-  // Clone value (to be safe) and insert a 'tag' into the field
-  // Current limitations: Cannot handle multiple tags
-  injectUserTag(user: any) {
-    this.targetCommentUsers.push(user);
-    let tag = encodeURI(`@${user.name}`);
-    let clonedForm = structuredClone(this.commentForm.value);
-    let newValue = clonedForm.message.replace('@', tag); // adjust to lastIndexOf
-    this.commentForm.controls['message'].setValue(`${newValue} `);
-    this.toggleUserDropdown();
-
-    // Could not figure out how to use ViewChild in short amount of time
-    setTimeout(() => {
-      // @ts-ignore
-      document.getElementById('message').focus()
-    }, 0)
+  // Use the unfinished tag to filter the list of users in dropdown
+  filterUserList() {
+    let comment = this.commentForm.value.comment
+    let idx = comment.lastIndexOf('@')
+    let slice = comment.slice(idx + 1).trim().toLowerCase()
+    if (slice.length >= 1) {
+      this.filteredUsers = this.users.filter(user => {
+        return user.name.toLowerCase().includes(slice)
+      })
+    } else {
+      this.filteredUsers = this.users
+    }
   }
 
+  // Current limitations: Cannot handle insertion in middle of string
+  injectUserTag(user: User) {
+    this.usersToAlert.push(user); // See sendAlert method
+    let tag = encodeURI(`@${user.name}`);
+    let comment = this.commentForm.value.comment
+    let idx = comment.lastIndexOf('@')
+    let newValue = `${comment.slice(0, idx)}${tag} `;
+
+    // Set value and close dropdown upon selection
+    this.commentForm.controls['comment'].setValue(newValue);
+    this.showUserDropdown = false;
+
+    /* Could not get ViewChild (likely preferred method) to work within the timeframe
+    Here we return focus to the textarea after selecting a user */
+    // @ts-ignore
+    document.getElementById('comment').focus() 
+  }
+
+  /* This is not an ideal way to do this, but it was a way to send the alert
+  without duplicating code that parses the comment */
+  usersToAlert: User[] = [];
   sendAlerts() {
-    this.targetCommentUsers.forEach(user => {
-      // MAKE API CALL HERE
-      console.log(`Action: Alerting ${user.name} that a comment referencing them has been created`);
-    });
+    this.alertService.sendAlerts(this.usersToAlert)
+    // Reset target array.
+    this.usersToAlert = []
   };
 };
